@@ -3,19 +3,28 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Argand Diagram Library Example</title>
+        <title>Argand Diagram Test</title>
     </head>
     <body>
+        <h1>Argand Diagram Test</h1>
+        <script type="module" src="../src/argandDiagram.js"></script>
         <script type="module">
-            import Argand_Diagram from "../src/argandDiagram.js"; // Path to module
+            import Argand_Diagram from "../src/argandDiagram.js";
 
-            // Create a complex number
-            const argandDiagram = new Argand_Diagram.ComplexNumber(3, 4);
+            const complexNumbers = new Argand_Diagram.ComplexNumber([
+                [3, 4],
+                [1, 2],
+                [5, 6],
+            ]);
 
-            console.log(`Complex Number: ${argandDiagram.toString}`);
-            console.log(
-                `Magnitude: ${Argand_Diagram.magnitude(argandDiagram)}`,
-            );
+            console.log(complexNumbers.toString);
+
+            complexNumbers.append([
+                [6.1, 5],
+                [3, 2],
+            ]);
+
+            console.log(complexNumbers.toString);
         </script>
     </body>
 </html>
