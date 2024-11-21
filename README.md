@@ -6,10 +6,8 @@ Organization:
   Argand_Diagrams/
   │
   ├── src/
-  │   ├── argandDiagram.js          // Main entry point for your module
-  │   └── constructors.js          // Constructor of the module
-  │   └── functions.js             // All of the functions of the module
+  │   ├── argandDiagram.js          // Contains Complex Number class and ArgandDiagram class
   │
   ├── test/
-        └── test.html              // Test files for your module
+        └── test.html              // Test files for your class
 ```
