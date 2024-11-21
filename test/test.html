@@ -1,15 +1,21 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script type="text/javascript" src="../main.js"></script>
-    <title>Test For The Library</title>
-</head>
-<body>
-    
-    <script>
-        Utilities.show("Hello");
-    </script>
-</body>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Argand Diagram Library Example</title>
+    </head>
+    <body>
+        <script type="module">
+            import Argand_Diagram from "../src/argandDiagram.js"; // Path to module
+
+            // Create a complex number
+            const argandDiagram = new Argand_Diagram.ComplexNumber(3, 4);
+
+            console.log(`Complex Number: ${argandDiagram.toString}`);
+            console.log(
+                `Magnitude: ${Argand_Diagram.magnitude(argandDiagram)}`,
+            );
+        </script>
+    </body>
 </html>
