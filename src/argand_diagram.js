@@ -1,4 +1,4 @@
-export class ComplexNumber {
+class ComplexNumbers {
   constructor(complexNumbers) {
     this.module_version = "1.0.0";
     this.complexNumbers = complexNumbers.map((complexNumber) => {
@@ -14,23 +14,23 @@ export class ComplexNumber {
         };
       } else {
         throw new Error(
-          "Correct argument: [[real, imaginery], [real, imaginery], ...]",
+          `Correct argument: [[real number, imaginary number], [real number, imaginary number], ...]
+        Correct Use Example: ComplexNumbers([[1, 2], [2, 3]]);
+        `,
         );
       }
     });
   }
 
-  // Method to get the string representation
-  get toString() {
-    return this.complexNumbers
-      .map((complexNumber) => {
-        return `${complexNumber.real} ${complexNumber.imaginary >= 0 ? "+" : "-"} ${Math.abs(complexNumber.imaginary)}i`;
-      })
-      .join(", ");
+  get AllPoints() {
+    return this.complexNumbers.map((complexNumber) => [
+      complexNumber.real,
+      complexNumber.imaginary,
+    ]);
   }
 
   // Method to append a new complex number
-  append(newComplexNumbers) {
+  appendComplexNumbers(newComplexNumbers) {
     if (!Array.isArray(newComplexNumbers)) {
       throw new Error("Input must be an array of complex numbers.");
     }
@@ -53,4 +53,28 @@ export class ComplexNumber {
       });
     });
   }
+
+  // Method to calculate the absolute value
+  absolute() {
+    return this.complexNumbers.map((complexNumber) => {
+      return Math.sqrt(complexNumber.real ** 2 + complexNumber.imaginary ** 2);
+    });
+  }
+
+  // Getter to get the string representation
+  get ComplexNumbersInStringFormat() {
+    return this.complexNumbers
+      .map((complexNumber) => {
+        return `${complexNumber.real} + ${complexNumber.imaginary}i`;
+      })
+      .join(", ");
+  }
+}
+
+class ArgandDiagram extends ComplexNumbers {
+  constructor(arrayOfComplexNumbers) {
+    super(arrayOfComplexNumbers);
+  }
+
+  draw() {}
 }

@@ -7,24 +7,26 @@
     </head>
     <body>
         <h1>Argand Diagram Test</h1>
-        <script type="module" src="../src/argandDiagram.js"></script>
-        <script type="module">
-            import Argand_Diagram from "../src/argandDiagram.js";
+        <script type="text/javascript" src="../src/argand_diagram.js"></script>
+        <script>
+            try {
+                const argand_diagram = new ArgandDiagram([[3, 4]]);
 
-            const complexNumbers = new Argand_Diagram.ComplexNumber([
-                [3, 4],
-                [1, 2],
-                [5, 6],
-            ]);
+                console.log(argand_diagram.ComplexNumbersInStringFormat);
 
-            console.log(complexNumbers.toString);
+                argand_diagram.appendComplexNumbers([
+                    [6.1, 5],
+                    [3, 2],
+                ]);
 
-            complexNumbers.append([
-                [6.1, 5],
-                [3, 2],
-            ]);
+                console.log(argand_diagram.ComplexNumbersInStringFormat);
 
-            console.log(complexNumbers.toString);
+                console.log(argand_diagram.AllPoints);
+
+                console.log(argand_diagram.absolute());
+            } catch (error) {
+                console.error("Error:", error);
+            }
         </script>
     </body>
 </html>
