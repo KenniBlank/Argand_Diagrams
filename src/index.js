@@ -85,7 +85,7 @@ for (const diagram of argandDiagrams) {
     point.setAttribute("cx", centerX);
     point.setAttribute("cy", centerY);
     point.setAttribute("r", 4);
-    point.setAttribute("fill", "grey");
+    point.setAttribute("fill", "black");
     svg.appendChild(point);
     pointsOnThePlot(svg, centerX, centerY, 0, 0); // Center of the screen
 
@@ -103,13 +103,13 @@ for (const diagram of argandDiagrams) {
   function drawGrid(svg, centerX, centerY, scale) {
     // Vertical grid lines
     for (let x = centerX % scale; x <= width; x += scale) {
-      const line = createLine(x, 0, x, height, "#ddd", 0.5);
+      const line = createLine(x, 0, x, height, "#a0b0c0", 0.5);
       svg.appendChild(line);
     }
 
     // Horizontal grid lines
     for (let y = centerY % scale; y <= height; y += scale) {
-      const line = createLine(0, y, width, y, "#ddd", 0.5);
+      const line = createLine(0, y, width, y, "#a0b0c0", 0.5);
       svg.appendChild(line);
     }
   }
@@ -177,8 +177,8 @@ for (const diagram of argandDiagrams) {
     text.setAttribute("x", X); // X position
     text.setAttribute("y", Y); // Y position
     text.setAttribute("font-style", "italic"); // Font style (italic)
-    text.setAttribute("font-size", "24"); // Font size
-    text.setAttribute("fill", "Red"); // Text color
+    text.setAttribute("font-size", "21"); // Font size
+    text.setAttribute("fill", "red"); // Text color
     text.textContent = `(${displayX}, ${displayY})`; // Initial text content
 
     // Initially hide the text
