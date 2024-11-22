@@ -1,0 +1,8 @@
+.ArgandDiagram {
+    text-align: center;
+}
+.ArgandDiagram canvas {
+    width: 99%;
+    border: 2px solid black;
+    margin-top: 10px;
+}
