@@ -1,16 +1,15 @@
-const canvas = document.getElementById("canvas");
-const ctx = canvas.getContext("2d");
+const svg = document.getElementById("svg");
 const equationInput = document.getElementById("equation");
 const plot = document.getElementById("plot");
 
-// Set canvas dimensions
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
+// Set SVG dimensions
+svg.setAttribute("width", window.innerWidth);
+svg.setAttribute("height", window.innerHeight);
 
-const width = canvas.width;
-const height = canvas.height;
-const centerX = Math.floor(width / 2); // Center of canvas for x-axis
-const centerY = Math.floor(height / 2); // Center of canvas for y-axis
+const width = window.innerWidth;
+const height = window.innerHeight;
+const centerX = Math.floor(width / 2); // Center of SVG for x-axis
+const centerY = Math.floor(height / 2); // Center of SVG for y-axis
 const scale = 15; // 1 unit = 30 pixels
 
 plot.addEventListener("click", () => {
@@ -20,41 +19,55 @@ plot.addEventListener("click", () => {
 
 // Draw axes and grid
 function drawAxesAndGrid() {
-  ctx.clearRect(0, 0, width, height);
+  // Clear SVG
+  svg.innerHTML = "";
+
+  // Draw grid
   drawGrid();
-  ctx.beginPath();
 
-  // X-axis
-  ctx.moveTo(0, centerY);
-  ctx.lineTo(width, centerY);
+  // Draw axes
+  const xAxis = document.createElementNS("http://www.w3.org/2000/svg", "line");
+  xAxis.setAttribute("x1", 0);
+  xAxis.setAttribute("y1", centerY);
+  xAxis.setAttribute("x2", width);
+  xAxis.setAttribute("y2", centerY);
+  xAxis.setAttribute("stroke", "black");
+  xAxis.setAttribute("stroke-width", 1.5);
+  svg.appendChild(xAxis);
 
-  // Y-axis
-  ctx.moveTo(centerX, 0);
-  ctx.lineTo(centerX, height);
-
-  ctx.strokeStyle = "black";
-  ctx.lineWidth = 1.5;
-  ctx.stroke();
+  const yAxis = document.createElementNS("http://www.w3.org/2000/svg", "line");
+  yAxis.setAttribute("x1", centerX);
+  yAxis.setAttribute("y1", 0);
+  yAxis.setAttribute("x2", centerX);
+  yAxis.setAttribute("y2", height);
+  yAxis.setAttribute("stroke", "black");
+  yAxis.setAttribute("stroke-width", 1.5);
+  svg.appendChild(yAxis);
 }
 
 function drawGrid() {
-  ctx.strokeStyle = "#ddd";
-  ctx.lineWidth = 0.5;
-
   // Vertical grid lines
   for (let x = centerX % scale; x <= width; x += scale) {
-    ctx.beginPath();
-    ctx.moveTo(x, 0);
-    ctx.lineTo(x, height);
-    ctx.stroke();
+    const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    line.setAttribute("x1", x);
+    line.setAttribute("y1", 0);
+    line.setAttribute("x2", x);
+    line.setAttribute("y2", height);
+    line.setAttribute("stroke", "#ddd");
+    line.setAttribute("stroke-width", 0.5);
+    svg.appendChild(line);
   }
 
   // Horizontal grid lines
   for (let y = centerY % scale; y <= height; y += scale) {
-    ctx.beginPath();
-    ctx.moveTo(0, y);
-    ctx.lineTo(width, y);
-    ctx.stroke();
+    const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    line.setAttribute("x1", 0);
+    line.setAttribute("y1", y);
+    line.setAttribute("x2", width);
+    line.setAttribute("y2", y);
+    line.setAttribute("stroke", "#ddd");
+    line.setAttribute("stroke-width", 0.5);
+    svg.appendChild(line);
   }
 }
 
@@ -63,7 +76,13 @@ function plotEquation(equation) {
   try {
     const parsedEquation = math.compile(equation); // Parse equation
     drawAxesAndGrid();
-    ctx.beginPath();
+
+    const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    path.setAttribute("stroke", "blue");
+    path.setAttribute("stroke-width", 2);
+    path.setAttribute("fill", "none");
+
+    let pathData = "";
 
     for (let pixelX = 0; pixelX <= width; pixelX++) {
       const x = (pixelX - centerX) / scale; // Convert canvas x to math x
@@ -75,15 +94,14 @@ function plotEquation(equation) {
       const canvasY = centerY - y * scale; // Convert math y to canvas y
 
       if (pixelX === 0) {
-        ctx.moveTo(canvasX, canvasY);
+        pathData += `M ${canvasX} ${canvasY}`;
       } else {
-        ctx.lineTo(canvasX, canvasY);
+        pathData += ` L ${canvasX} ${canvasY}`;
       }
     }
 
-    ctx.strokeStyle = "blue";
-    ctx.lineWidth = 2;
-    ctx.stroke();
+    path.setAttribute("d", pathData);
+    svg.appendChild(path);
   } catch (error) {
     alert(
       "Error plotting the equation. Ensure it's valid and uses 'x' as the variable.",

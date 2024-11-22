@@ -1,8 +1,8 @@
 .ArgandDiagram {
     text-align: center;
 }
-.ArgandDiagram canvas {
+.ArgandDiagram svg {
     width: 99%;
-    border: 2px solid black;
+    border: 2px solid grey;
     margin-top: 10px;
 }
