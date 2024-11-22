@@ -1,113 +1,119 @@
-const svg = document.getElementById("svg");
-const equationInput = document.getElementById("equation");
-const plot = document.getElementById("plot");
+const argandDiagrams = document.getElementsByClassName("ArgandDiagram");
 
-// Set SVG dimensions
-svg.setAttribute("width", window.innerWidth);
-svg.setAttribute("height", window.innerHeight);
+for (const diagram of argandDiagrams) {
+  const svg = diagram.querySelector("svg");
+  const equationInputs = diagram.querySelectorAll("input[type='text']");
 
-const width = window.innerWidth;
-const height = window.innerHeight;
-const centerX = Math.floor(width / 2); // Center of SVG for x-axis
-const centerY = Math.floor(height / 2); // Center of SVG for y-axis
-const scale = 15; // 1 unit = 30 pixels
+  // Set SVG dimensions
+  svg.setAttribute("width", window.innerWidth / argandDiagrams.length);
+  svg.setAttribute("height", window.innerHeight);
 
-plot.addEventListener("click", () => {
-  const equation = equationInput.value.trim();
-  plotEquation(equation);
-});
+  const width = svg.getAttribute("width");
+  const height = svg.getAttribute("height");
+  const centerX = Math.floor(width / 2); // Center of SVG for x-axis
+  const centerY = Math.floor(height / 2); // Center of SVG for y-axis
+  const scale = 12; // 1 unit = 15 pixels
 
-// Draw axes and grid
-function drawAxesAndGrid() {
-  // Clear SVG
-  svg.innerHTML = "";
+  function addInputEventListener(inputField) {
+    inputField.addEventListener("keypress", (event) => {
+      if (event.key === "Enter") {
+        const equation = inputField.value.trim();
+        plotComplexNumber(equation, svg, centerX, centerY, scale);
 
-  // Draw grid
-  drawGrid();
+        // Create a new input field
+        const newInputField = document.createElement("input");
+        newInputField.type = "text";
+        newInputField.placeholder = "Z = a + ib";
+        newInputField.classList.add("equations");
 
-  // Draw axes
-  const xAxis = document.createElementNS("http://www.w3.org/2000/svg", "line");
-  xAxis.setAttribute("x1", 0);
-  xAxis.setAttribute("y1", centerY);
-  xAxis.setAttribute("x2", width);
-  xAxis.setAttribute("y2", centerY);
-  xAxis.setAttribute("stroke", "black");
-  xAxis.setAttribute("stroke-width", 1.5);
-  svg.appendChild(xAxis);
+        // Add the same event listener to the new input field
+        addInputEventListener(newInputField);
 
-  const yAxis = document.createElementNS("http://www.w3.org/2000/svg", "line");
-  yAxis.setAttribute("x1", centerX);
-  yAxis.setAttribute("y1", 0);
-  yAxis.setAttribute("x2", centerX);
-  yAxis.setAttribute("y2", height);
-  yAxis.setAttribute("stroke", "black");
-  yAxis.setAttribute("stroke-width", 1.5);
-  svg.appendChild(yAxis);
-}
-
-function drawGrid() {
-  // Vertical grid lines
-  for (let x = centerX % scale; x <= width; x += scale) {
-    const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
-    line.setAttribute("x1", x);
-    line.setAttribute("y1", 0);
-    line.setAttribute("x2", x);
-    line.setAttribute("y2", height);
-    line.setAttribute("stroke", "#ddd");
-    line.setAttribute("stroke-width", 0.5);
-    svg.appendChild(line);
-  }
-
-  // Horizontal grid lines
-  for (let y = centerY % scale; y <= height; y += scale) {
-    const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
-    line.setAttribute("x1", 0);
-    line.setAttribute("y1", y);
-    line.setAttribute("x2", width);
-    line.setAttribute("y2", y);
-    line.setAttribute("stroke", "#ddd");
-    line.setAttribute("stroke-width", 0.5);
-    svg.appendChild(line);
-  }
-}
-
-// Plot equation
-function plotEquation(equation) {
-  try {
-    const parsedEquation = math.compile(equation); // Parse equation
-    drawAxesAndGrid();
-
-    const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-    path.setAttribute("stroke", "blue");
-    path.setAttribute("stroke-width", 2);
-    path.setAttribute("fill", "none");
-
-    let pathData = "";
-
-    for (let pixelX = 0; pixelX <= width; pixelX++) {
-      const x = (pixelX - centerX) / scale; // Convert canvas x to math x
-      const y = parsedEquation.evaluate({ x }); // Evaluate equation
-
-      if (isNaN(y) || !isFinite(y)) continue; // Skip invalid points
-
-      const canvasX = pixelX;
-      const canvasY = centerY - y * scale; // Convert math y to canvas y
-
-      if (pixelX === 0) {
-        pathData += `M ${canvasX} ${canvasY}`;
-      } else {
-        pathData += ` L ${canvasX} ${canvasY}`;
+        // Insert a <br> and the new input field after the current input
+        const br = document.createElement("br");
+        inputField.parentNode.insertBefore(br, inputField.nextSibling);
+        inputField.parentNode.insertBefore(newInputField, br.nextSibling);
       }
+    });
+  }
+
+  // Attach event listener to all initial input fields
+  equationInputs.forEach((inputField) => {
+    addInputEventListener(inputField);
+  });
+
+  // Draw axes and grid
+  function drawAxesAndGrid(svg, centerX, centerY) {
+    // Clear SVG
+    svg.innerHTML = "";
+
+    // Draw grid
+    drawGrid(svg, centerX, centerY, scale);
+
+    // Draw axes
+    const xAxis = createLine(0, centerY, width, centerY, "black", 1.5);
+    svg.appendChild(xAxis);
+
+    const yAxis = createLine(centerX, 0, centerX, height, "black", 1.5);
+    svg.appendChild(yAxis);
+  }
+
+  function drawGrid(svg, centerX, centerY, scale) {
+    // Vertical grid lines
+    for (let x = centerX % scale; x <= width; x += scale) {
+      const line = createLine(x, 0, x, height, "#ddd", 0.5);
+      svg.appendChild(line);
     }
 
-    path.setAttribute("d", pathData);
-    svg.appendChild(path);
-  } catch (error) {
-    alert(
-      "Error plotting the equation. Ensure it's valid and uses 'x' as the variable.",
-    );
+    // Horizontal grid lines
+    for (let y = centerY % scale; y <= height; y += scale) {
+      const line = createLine(0, y, width, y, "#ddd", 0.5);
+      svg.appendChild(line);
+    }
   }
-}
 
-// Initial setup
-drawAxesAndGrid();
+  function createLine(x1, y1, x2, y2, color, strokeWidth) {
+    const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    line.setAttribute("x1", x1);
+    line.setAttribute("y1", y1);
+    line.setAttribute("x2", x2);
+    line.setAttribute("y2", y2);
+    line.setAttribute("stroke", color);
+    line.setAttribute("stroke-width", strokeWidth);
+    return line;
+  }
+
+  // Plot a complex number
+  function plotComplexNumber(equation, svg, centerX, centerY, scale) {
+    // Parse the complex number
+    let match = equation.match(/Z\s*=\s*([\d.-]+)\s*\+\s*\s*([\d.-]+i)/);
+
+    if (!match)
+      throw new Error("Invalid format. Use Z = a + ib or Z = (a, b).");
+
+    const [real, imaginary] = [parseFloat(match[1]), parseFloat(match[2])];
+
+    // Convert to canvas coordinates
+    const canvasX = centerX + real * scale;
+    const canvasY = centerY - imaginary * scale;
+
+    // Draw the point
+    const point = document.createElementNS(
+      "http://www.w3.org/2000/svg",
+      "circle",
+    );
+
+    point.setAttribute("cx", canvasX);
+    point.setAttribute("cy", canvasY);
+    point.setAttribute("r", 2);
+    point.setAttribute("fill", "blue");
+    svg.appendChild(point);
+
+    // Draw the line from origin to point
+    // const line = createLine(centerX, centerY, canvasX, canvasY, "blue", 1.5);
+    // svg.appendChild(line);
+  }
+
+  // Initial setup
+  drawAxesAndGrid(svg, centerX, centerY);
+}

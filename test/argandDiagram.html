@@ -3,23 +3,15 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Argand Diagram</title>
         <link rel="stylesheet" type="text/css" href="../src/styles.css" />
+        <title>Argand Diagram</title>
     </head>
+
     <body>
         <div class="ArgandDiagram">
-            <h2>Argand Diagram</h2>
-            <div id="controls">
-                <input
-                    type="text"
-                    id="equation"
-                    placeholder="Z = a + ib or Z = (a, b)"
-                />
-                <button id="plot">Plot</button>
-            </div>
+            <input type="text" class="equations" placeholder="Z = a + ib" />
             <svg id="svg"></svg>
         </div>
-
         <script src="../src/index.js"></script>
     </body>
 </html>
