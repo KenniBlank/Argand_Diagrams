@@ -23,7 +23,7 @@ for (const diagram of argandDiagrams) {
   const height = svg.getAttribute("height");
   const centerX = Math.floor(width / 2); // Center of SVG for x-axis
   const centerY = Math.floor(height / 2); // Center of SVG for y-axis
-  const scale = 20; // 1 unit = 15 pixels
+  const scale = 15; // 1 unit = 15 pixels
 
   const allInputs = diagram.querySelectorAll("#inputs input");
 
@@ -33,7 +33,7 @@ for (const diagram of argandDiagrams) {
         // Create a new input field
         const newInputField = document.createElement("input");
         newInputField.type = "text";
-        newInputField.placeholder = "Z = a + ib";
+        newInputField.placeholder = "(a, b)";
         newInputField.classList.add("equations");
 
         // Add the same event listener to the new input field
@@ -53,8 +53,16 @@ for (const diagram of argandDiagrams) {
     inputField.addEventListener("keypress", handleKeyPress);
     inputField.addEventListener("keypress", (event) => {
       if (event.key === "Enter") {
-        const equation = inputField.value.trim();
-        plotComplexNumber(equation, svg, centerX, centerY, scale);
+        drawAxesAndGrid(svg, centerX, centerY);
+
+        const equationInputsTemp = diagram.querySelectorAll(
+          "div#AllInputs input[type='text']",
+        );
+
+        equationInputsTemp.forEach((inputFields) => {
+          const equation = inputFields.value.trim();
+          plotComplexNumber(equation, svg, centerX, centerY, scale);
+        });
       }
     });
   }
@@ -68,6 +76,18 @@ for (const diagram of argandDiagrams) {
   function drawAxesAndGrid(svg, centerX, centerY) {
     // Clear SVG
     svg.innerHTML = "";
+
+    // Catesian Center
+    const point = document.createElementNS(
+      "http://www.w3.org/2000/svg",
+      "circle",
+    );
+    point.setAttribute("cx", centerX);
+    point.setAttribute("cy", centerY);
+    point.setAttribute("r", 4);
+    point.setAttribute("fill", "grey");
+    svg.appendChild(point);
+    pointsOnThePlot(svg, centerX, centerY, 0, 0); // Center of the screen
 
     // Draw grid
     drawGrid(svg, centerX, centerY, scale);
@@ -108,16 +128,29 @@ for (const diagram of argandDiagrams) {
   // Plot a complex number
   function plotComplexNumber(equation, svg, centerX, centerY, scale) {
     // Parse the complex number
-    let match = equation.match(/Z\s*=\s*([\d.-]+)\s*\+\s*\s*([\d.-]+i)/);
+    let regexPattern = /\(\s*(-?\d*\.?\d+)\s*,\s*(-?\d*\.?\d+)\s*\)/;
+    let match = equation.match(regexPattern);
 
-    if (!match)
-      throw new Error("Invalid format. Use Z = a + ib or Z = (a, b).");
-
-    const [real, imaginary] = [parseFloat(match[1]), parseFloat(match[2])];
+    let real, imaginary;
+    try {
+      // Ensure match is not null or undefined before accessing it
+      if (match && match.length > 2) {
+        real = parseFloat(match[1]);
+        imaginary = parseFloat(match[2]);
+      } else {
+        // Continue if match error
+        return;
+      }
+    } catch (error) {
+      console.error("Error parsing match values:", error);
+    }
 
     // Convert to canvas coordinates
     const canvasX = centerX + real * scale;
     const canvasY = centerY - imaginary * scale;
+
+    console.log(real, imaginary);
+    pointsOnThePlot(svg, canvasX, canvasY, real, imaginary); // Draw the point's location on the plane
 
     // Draw the point
     const point = document.createElementNS(
@@ -132,8 +165,52 @@ for (const diagram of argandDiagrams) {
     svg.appendChild(point);
 
     // Draw the line from origin to point
-    const line = createLine(centerX, centerY, canvasX, canvasY, "grey", 1.5);
+    const line = createLine(centerX, centerY, canvasX, canvasY, "black", 1.5);
     svg.appendChild(line);
+  }
+
+  function pointsOnThePlot(svg, X, Y, displayX, displayY) {
+    // Create an SVG <text> element
+    const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+
+    // Set attributes for the text element
+    text.setAttribute("x", X); // X position
+    text.setAttribute("y", Y); // Y position
+    text.setAttribute("font-style", "italic"); // Font style (italic)
+    text.setAttribute("font-size", "24"); // Font size
+    text.setAttribute("fill", "Red"); // Text color
+    text.textContent = `(${displayX}, ${displayY})`; // Initial text content
+
+    // Initially hide the text
+    text.style.display = "none";
+
+    // Append the text element to the SVG container
+    svg.appendChild(text);
+
+    // Show/hide text based on mouse position
+    svg.addEventListener("mousemove", function (event) {
+      const rect = svg.getBoundingClientRect(); // Get the SVG's position
+      const mouseX = event.clientX - rect.left; // Mouse X relative to SVG
+      const mouseY = event.clientY - rect.top; // Mouse Y relative to SVG
+
+      // Check if mouse is near (centerX, centerY) within a tolerance
+      const tolerance = 5; // Tolerance distance
+      if (
+        Math.abs(mouseX - X) <= tolerance &&
+        Math.abs(mouseY - Y) <= tolerance
+      ) {
+        // Update text content dynamically to show the mouse coordinates
+        // text.textContent = `(${mouseX}, ${mouseY})`;
+
+        // Center the text above the mouse cursor
+        text.setAttribute("x", mouseX - text.getBBox().width / 2); // Center horizontally
+        text.setAttribute("y", mouseY - 10); // 10px above the mouse
+
+        text.style.display = "block"; // Show the text
+      } else {
+        text.style.display = "none"; // Hide the text
+      }
+    });
   }
 
   // Initial setup
