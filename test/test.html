@@ -7,26 +7,24 @@
     </head>
     <body>
         <h1>Argand Diagram Test</h1>
+        <svg id="cartesian-plane" width="400" height="400"></svg>
         <script type="text/javascript" src="../src/argand_diagram.js"></script>
         <script>
-            try {
-                const argand_diagram = new ArgandDiagram([[3, 4]]);
+            const argand_diagram = new ArgandDiagram([[3, 4]]);
 
-                console.log(argand_diagram.ComplexNumbersInStringFormat);
+            console.log(argand_diagram.ComplexNumbersInStringFormat);
 
-                argand_diagram.appendComplexNumbers([
-                    [6.1, 5],
-                    [3, 2],
-                ]);
+            argand_diagram.appendComplexNumbers([
+                [6.1, 5],
+                [3, 2],
+            ]);
 
-                console.log(argand_diagram.ComplexNumbersInStringFormat);
+            console.log(argand_diagram.ComplexNumbersInStringFormat);
 
-                console.log(argand_diagram.AllPoints);
+            console.log(argand_diagram.AllPoints);
 
-                console.log(argand_diagram.absolute());
-            } catch (error) {
-                console.error("Error:", error);
-            }
+            console.log(argand_diagram.absolute());
+            argand_diagram.draw();
         </script>
     </body>
 </html>
