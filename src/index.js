@@ -1,8 +1,19 @@
 const argandDiagrams = document.getElementsByClassName("ArgandDiagram");
 
 for (const diagram of argandDiagrams) {
-  const svg = diagram.querySelector("svg");
+  const svg = diagram.querySelector(".ArgandDiagram > svg");
   const equationInputs = diagram.querySelectorAll("input[type='text']");
+
+  const toggleMenu = diagram.querySelector("div#hideInputs");
+
+  toggleMenu.addEventListener("click", () => {
+    const equationInputsTemp = diagram.querySelectorAll(
+      "div#AllInputs input[type='text'",
+    );
+    equationInputsTemp.forEach((input) => {
+      input.style.display = input.style.display === "none" ? "block" : "none";
+    });
+  });
 
   // Set SVG dimensions
   svg.setAttribute("width", window.innerWidth / argandDiagrams.length);
@@ -12,14 +23,13 @@ for (const diagram of argandDiagrams) {
   const height = svg.getAttribute("height");
   const centerX = Math.floor(width / 2); // Center of SVG for x-axis
   const centerY = Math.floor(height / 2); // Center of SVG for y-axis
-  const scale = 12; // 1 unit = 15 pixels
+  const scale = 20; // 1 unit = 15 pixels
+
+  const allInputs = diagram.querySelectorAll("#inputs input");
 
   function addInputEventListener(inputField) {
-    inputField.addEventListener("keypress", (event) => {
+    function handleKeyPress(event) {
       if (event.key === "Enter") {
-        const equation = inputField.value.trim();
-        plotComplexNumber(equation, svg, centerX, centerY, scale);
-
         // Create a new input field
         const newInputField = document.createElement("input");
         newInputField.type = "text";
@@ -33,6 +43,18 @@ for (const diagram of argandDiagrams) {
         const br = document.createElement("br");
         inputField.parentNode.insertBefore(br, inputField.nextSibling);
         inputField.parentNode.insertBefore(newInputField, br.nextSibling);
+        newInputField.focus();
+
+        // Remove the event listener
+        inputField.removeEventListener("keypress", handleKeyPress);
+      }
+    }
+
+    inputField.addEventListener("keypress", handleKeyPress);
+    inputField.addEventListener("keypress", (event) => {
+      if (event.key === "Enter") {
+        const equation = inputField.value.trim();
+        plotComplexNumber(equation, svg, centerX, centerY, scale);
       }
     });
   }
@@ -105,13 +127,13 @@ for (const diagram of argandDiagrams) {
 
     point.setAttribute("cx", canvasX);
     point.setAttribute("cy", canvasY);
-    point.setAttribute("r", 2);
+    point.setAttribute("r", 3);
     point.setAttribute("fill", "blue");
     svg.appendChild(point);
 
     // Draw the line from origin to point
-    // const line = createLine(centerX, centerY, canvasX, canvasY, "blue", 1.5);
-    // svg.appendChild(line);
+    const line = createLine(centerX, centerY, canvasX, canvasY, "grey", 1.5);
+    svg.appendChild(line);
   }
 
   // Initial setup
