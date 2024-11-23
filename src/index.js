@@ -244,7 +244,6 @@ for (const diagram of argandDiagrams) {
         if (existingText) {
           allSVGPointTexts.delete(existingText);
           svg.addEventListener("mousemove", mouseMoveHandler);
-          svg.removeChild(text);
         } else {
           allSVGPointTexts.add(text);
         }
