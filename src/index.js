@@ -25,7 +25,7 @@ for (const diagram of argandDiagrams) {
   const height = svg.getAttribute("height");
   const centerX = Math.floor(width / 2); // Center of SVG for x-axis
   const centerY = Math.floor(height / 2); // Center of SVG for y-axis
-  const scale = 15; // 1 unit = 15 pixels
+  const scale = 30; // 1 unit = 20 pixels
 
   const allInputs = diagram.querySelectorAll("#inputs input");
 
@@ -102,22 +102,76 @@ for (const diagram of argandDiagrams) {
     svg.appendChild(yAxis);
 
     // Draw tick markings:
-    let fontSize = 22;
-    let numeric = document.createElementNS(
-      "http://www.w3.org/2000/svg",
-      "text",
-    );
-    numeric.setAttribute("x", 5);
-    numeric.setAttribute("y", centerY + fontSize);
-    numeric.setAttribute("font-size", fontSize);
-    numeric.setAttribute("font-style", "italic");
-    numeric.setAttribute("stroke", "white");
-    numeric.setAttribute("stroke-width", "2");
-    numeric.setAttribute("paint-order", "stroke");
-    numeric.setAttribute("fill", "black");
-    numeric.textContent = "-Re";
-    svg.appendChild(numeric);
-    for (let y = centerY % scale; y <= height; y += scale) {}
+    let fontSize = 0.5 * scale,
+      varValue = 1;
+    for (let x = centerX % scale; x <= width; x += scale) {
+      let PosReal = document.createElementNS(
+        "http://www.w3.org/2000/svg",
+        "text",
+      );
+      if (Math.abs(varValue) < 10) {
+        PosReal.setAttribute("x", centerX + scale * varValue - fontSize / 4);
+      } else {
+        PosReal.setAttribute("x", centerX + scale * varValue - fontSize / 2);
+      }
+      PosReal.setAttribute("y", centerY - scale / 9);
+      PosReal.setAttribute("font-size", fontSize);
+      PosReal.setAttribute("fill", "black");
+      PosReal.setAttribute("fontFamily", "Monaco");
+      PosReal.setAttribute("stroke", "white");
+      PosReal.setAttribute("stroke-width", "2");
+      PosReal.setAttribute("paint-order", "stroke");
+      PosReal.textContent = `${varValue}`;
+      svg.appendChild(PosReal);
+
+      // Mirror value print in opposite direction
+      let NegReal = PosReal.cloneNode(true);
+      NegReal.textContent = `-${varValue}`;
+      if (Math.abs(varValue) < 10) {
+        NegReal.setAttribute(
+          "x",
+          centerX - scale * varValue + fontSize / 2 - fontSize,
+        );
+      } else {
+        NegReal.setAttribute(
+          "x",
+          centerX - scale * varValue - fontSize + (fontSize / 7) * 2,
+        );
+      }
+      svg.appendChild(NegReal);
+
+      varValue++;
+    }
+
+    varValue = 1;
+    for (let y = centerY % scale; y <= height; y += scale) {
+      let NegImag = document.createElementNS(
+        "http://www.w3.org/2000/svg",
+        "text",
+      );
+
+      NegImag.setAttribute("x", centerX + 4);
+      NegImag.setAttribute("y", centerY + scale * varValue + fontSize / 4 - 1);
+
+      NegImag.setAttribute("font-size", fontSize);
+      NegImag.setAttribute("fill", "black");
+      NegImag.setAttribute("fontFamily", "Monaco");
+      NegImag.setAttribute("stroke", "white");
+      NegImag.setAttribute("stroke-width", "1");
+      NegImag.setAttribute("paint-order", "stroke");
+      NegImag.textContent = `-${varValue}𝑖`;
+      svg.appendChild(NegImag);
+
+      // Mirror value print in opposite direction
+      let PosImag = NegImag.cloneNode(true);
+      PosImag.setAttribute("x", centerX + fontSize / 3);
+      PosImag.textContent = `${varValue}𝑖`;
+      PosImag.setAttribute("y", centerY - scale * varValue + fontSize / 4 - 1);
+
+      svg.appendChild(PosImag);
+
+      varValue++;
+    }
   }
 
   function drawGrid(svg, centerX, centerY, scale) {
@@ -161,13 +215,12 @@ for (const diagram of argandDiagrams) {
     let PosImag = PosReal.cloneNode(true);
     PosImag.textContent = "+Im";
     PosImag.setAttribute("fill", "red");
-    PosImag.setAttribute("x", centerX);
+    PosImag.setAttribute("x", centerX - fontSize * 2);
     PosImag.setAttribute("y", fontSize);
     svg.appendChild(PosImag);
 
     let NegImag = PosImag.cloneNode(true);
     NegImag.textContent = "-Im";
-    NegImag.setAttribute("x", centerX);
     NegImag.setAttribute("y", height - fontSize / 2);
     svg.appendChild(NegImag);
   }
