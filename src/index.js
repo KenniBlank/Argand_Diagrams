@@ -102,7 +102,22 @@ for (const diagram of argandDiagrams) {
     svg.appendChild(yAxis);
 
     // Draw tick markings:
-    //
+    let fontSize = 22;
+    let numeric = document.createElementNS(
+      "http://www.w3.org/2000/svg",
+      "text",
+    );
+    numeric.setAttribute("x", 5);
+    numeric.setAttribute("y", centerY + fontSize);
+    numeric.setAttribute("font-size", fontSize);
+    numeric.setAttribute("font-style", "italic");
+    numeric.setAttribute("stroke", "white");
+    numeric.setAttribute("stroke-width", "2");
+    numeric.setAttribute("paint-order", "stroke");
+    numeric.setAttribute("fill", "black");
+    numeric.textContent = "-Re";
+    svg.appendChild(numeric);
+    for (let y = centerY % scale; y <= height; y += scale) {}
   }
 
   function drawGrid(svg, centerX, centerY, scale) {
@@ -119,37 +134,42 @@ for (const diagram of argandDiagrams) {
     }
 
     // Axis Name:
+    let fontSize = 22;
     let NegReal = document.createElementNS(
       "http://www.w3.org/2000/svg",
       "text",
     );
     NegReal.setAttribute("x", 5);
-    NegReal.setAttribute("font-size", "25");
-    NegReal.setAttribute("y", centerY + NegReal.getBBox().height);
+    NegReal.setAttribute("font-size", fontSize);
+    NegReal.setAttribute("y", centerY + fontSize);
     NegReal.setAttribute("font-style", "italic");
     NegReal.setAttribute("stroke", "white");
     NegReal.setAttribute("stroke-width", "2");
     NegReal.setAttribute("paint-order", "stroke");
-    NegReal.setAttribute("fill", "black");
+    NegReal.setAttribute("fill", "green");
     NegReal.textContent = "-Re";
     svg.appendChild(NegReal);
 
     let PosReal = NegReal.cloneNode(true);
     PosReal.textContent = "+Re";
-    PosReal.setAttribute("x", width - PosReal.textContent.length * 26);
+    PosReal.setAttribute(
+      "x",
+      width - PosReal.textContent.length * (fontSize + 3),
+    );
     svg.appendChild(PosReal);
 
     let PosImag = PosReal.cloneNode(true);
     PosImag.textContent = "+Im";
+    PosImag.setAttribute("fill", "red");
     PosImag.setAttribute("x", centerX);
-    PosImag.setAttribute("y", 25);
+    PosImag.setAttribute("y", fontSize);
     svg.appendChild(PosImag);
 
-    let PosNeg = PosImag.cloneNode(true);
-    PosNeg.textContent = "-Im";
-    PosNeg.setAttribute("x", centerX);
-    PosNeg.setAttribute("y", height - 10);
-    svg.appendChild(PosNeg);
+    let NegImag = PosImag.cloneNode(true);
+    NegImag.textContent = "-Im";
+    NegImag.setAttribute("x", centerX);
+    NegImag.setAttribute("y", height - fontSize / 2);
+    svg.appendChild(NegImag);
   }
 
   function createLine(x1, y1, x2, y2, color, strokeWidth) {
