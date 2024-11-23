@@ -14,10 +14,23 @@
             <div id="hideInputs">|||</div>
             <div id="AllInputs">
                 <div class="input-container">
-                    <input type="text" placeholder="(a, b)" />
+                    <input type="text" disabled value="(5, 0)" />
+                </div>
+                <div class="input-container">
+                    <input type="text" disabled value="(-5, 0)" />
+                </div>
+                <div class="input-container">
+                    <input type="text" disabled value="(0, -5)" />
+                </div>
+                <div class="input-container">
+                    <input type="text" disabled value="(0, 5)" />
+                </div>
+                <div class="input-container">
+                    <input type="text" placeholder="(a, b)" required />
                 </div>
             </div>
-
+            <div id="zoomIn">Zoom In</div>
+            <div id="zoomOut">Zoom Out</div>
             <svg id="svg"></svg>
         </div>
         <script src="../src/index.js"></script>

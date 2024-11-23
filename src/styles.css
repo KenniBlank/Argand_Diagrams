@@ -4,22 +4,25 @@
 .ArgandDiagram > svg {
     width: 99%;
     border: 2px solid grey;
+    border-radius: 8px;
     margin-top: 10px;
 }
 
 .ArgandDiagram > #AllInputs {
     margin-top: 1rem;
-    max-height: 85%;
-    max-width: 90%;
+    margin-left: 2rem;
+    height: 55%;
     position: absolute;
-    margin: 1rem;
     padding: 1rem;
     overflow-y: auto;
+    width: 30%;
+    min-width: 100px;
+    max-width: 250px;
 }
 
 .ArgandDiagram > div#hideInputs {
     position: absolute;
-    z-index: 1;
+    z-index: 100;
     cursor: pointer;
     transform: rotate(90deg);
     font-size: 2rem;
@@ -35,18 +38,42 @@
         box-shadow 0.1s;
 }
 
+.ArgandDiagram > #zoomIn,
+.ArgandDiagram > #zoomOut {
+    position: absolute;
+    right: 0;
+    margin-right: 2rem;
+    padding: 0.2rem;
+    font-size: 1.2rem;
+    border: 1px solid black;
+    cursor: pointer;
+    width: 50px;
+    border-radius: 8px;
+}
+
+.ArgandDiagram > #zoomOut {
+    top: 10rem;
+}
+.ArgandDiagram > #zoomIn {
+    top: 6rem;
+}
+
 input {
-    margin-left: 2rem;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+
+    width: 80%;
     margin-top: 1rem;
     font-weight: bolder;
     font-size: 120%;
     border: 2px solid #ccc; /* Light gray border */
     border-radius: 8px; /* Rounded corners */
-    padding: 10px 15px; /* Add some spacing */
+    padding: 10px; /* Add some spacing */
     outline: none; /* Remove blue outline on focus */
     transition:
-        border-color 0.3s,
-        box-shadow 0.3s;
+        border-color 0.2s,
+        box-shadow 0.2s;
 }
 
 input:focus {

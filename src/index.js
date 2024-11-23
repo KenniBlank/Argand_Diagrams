@@ -8,8 +8,9 @@ for (const diagram of argandDiagrams) {
 
   toggleMenu.addEventListener("click", () => {
     const equationInputsTemp = diagram.querySelectorAll(
-      "div#AllInputs input[type='text'",
+      "div#AllInputs input[type='text'], div#zoomIn, div#zoomOut",
     );
+
     equationInputsTemp.forEach((input) => {
       input.style.display = input.style.display === "none" ? "block" : "none";
     });
@@ -29,8 +30,12 @@ for (const diagram of argandDiagrams) {
 
   function addInputEventListener(inputField) {
     function handleKeyPress(event) {
+      // Todo: check if input in correct suitable format
+      if (this.value == "") {
+        return;
+      }
+
       if (event.key === "Enter") {
-        // Create a new input field
         const newInputField = document.createElement("input");
         newInputField.type = "text";
         newInputField.placeholder = "(a, b)";
@@ -55,6 +60,8 @@ for (const diagram of argandDiagrams) {
       if (event.key === "Enter") {
         drawAxesAndGrid(svg, centerX, centerY);
 
+        // drawTickMarkings(svg, centerX, centerY, scale);
+
         const equationInputsTemp = diagram.querySelectorAll(
           "div#AllInputs input[type='text']",
         );
@@ -63,6 +70,12 @@ for (const diagram of argandDiagrams) {
           const equation = inputFields.value.trim();
           plotComplexNumber(equation, svg, centerX, centerY, scale);
         });
+
+        // Display All the points that user selected
+        for (const points of allSVGPointTexts) {
+          svg.appendChild(points);
+          console.log(points.textContent);
+        }
       }
     });
   }
@@ -77,16 +90,6 @@ for (const diagram of argandDiagrams) {
     // Clear SVG
     svg.innerHTML = "";
 
-    // Catesian Center
-    const point = document.createElementNS(
-      "http://www.w3.org/2000/svg",
-      "circle",
-    );
-    point.setAttribute("cx", centerX);
-    point.setAttribute("cy", centerY);
-    point.setAttribute("r", 4);
-    point.setAttribute("fill", "black");
-    svg.appendChild(point);
     pointsOnThePlot(svg, centerX, centerY, 0, 0); // Center of the screen
 
     // Draw grid
@@ -149,9 +152,6 @@ for (const diagram of argandDiagrams) {
     const canvasX = centerX + real * scale;
     const canvasY = centerY - imaginary * scale;
 
-    console.log(real, imaginary);
-    pointsOnThePlot(svg, canvasX, canvasY, real, imaginary); // Draw the point's location on the plane
-
     // Draw the point
     const point = document.createElementNS(
       "http://www.w3.org/2000/svg",
@@ -165,30 +165,45 @@ for (const diagram of argandDiagrams) {
     svg.appendChild(point);
 
     // Draw the line from origin to point
-    const line = createLine(centerX, centerY, canvasX, canvasY, "black", 1.5);
-    svg.appendChild(line);
+    // const line = createLine(centerX, centerY, canvasX, canvasY, "red", 1);
+    // svg.appendChild(line);
+
+    pointsOnThePlot(svg, canvasX, canvasY, real, imaginary); // Draw the point's location on the plane
   }
 
+  const allSVGPointTexts = new Set();
   function pointsOnThePlot(svg, X, Y, displayX, displayY) {
     // Create an SVG <text> element
     const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    text.setAttribute("x", X);
+    text.setAttribute("y", Y);
+    text.setAttribute("font-style", "italic");
+    text.setAttribute("font-size", "24");
+    text.setAttribute("stroke", "white");
+    text.setAttribute("stroke-width", "2");
+    text.setAttribute("paint-order", "stroke");
+    text.setAttribute("fill", "red");
 
-    // Set attributes for the text element
-    text.setAttribute("x", X); // X position
-    text.setAttribute("y", Y); // Y position
-    text.setAttribute("font-style", "italic"); // Font style (italic)
-    text.setAttribute("font-size", "21"); // Font size
-    text.setAttribute("fill", "red"); // Text color
-    text.textContent = `(${displayX}, ${displayY})`; // Initial text content
-
-    // Initially hide the text
+    if (displayX != 0) {
+      if (displayY > 0) {
+        text.textContent = `${displayX} + ${displayY}i`;
+      } else if (displayY == 0) {
+        text.textContent = `${displayX}`;
+      } else {
+        text.textContent = `${displayX} - ${Math.abs(displayY)}i`;
+      }
+    } else {
+      if (displayY != 0) {
+        text.textContent = `${displayY}i`;
+      } else {
+        text.textContent = `(0, 0)`;
+      }
+    }
     text.style.display = "none";
 
-    // Append the text element to the SVG container
     svg.appendChild(text);
 
-    // Show/hide text based on mouse position
-    svg.addEventListener("mousemove", function (event) {
+    const hoverPoints = function (event) {
       const rect = svg.getBoundingClientRect(); // Get the SVG's position
       const mouseX = event.clientX - rect.left; // Mouse X relative to SVG
       const mouseY = event.clientY - rect.top; // Mouse Y relative to SVG
@@ -204,11 +219,35 @@ for (const diagram of argandDiagrams) {
 
         // Center the text above the mouse cursor
         text.setAttribute("x", mouseX - text.getBBox().width / 2); // Center horizontally
-        text.setAttribute("y", mouseY - 10); // 10px above the mouse
+        text.setAttribute("y", mouseY - 10); // 10px above mouse
+        return true;
+      }
+      return false;
+    };
 
+    const mouseMoveHandler = function (event) {
+      if (hoverPoints(event)) {
         text.style.display = "block"; // Show the text
       } else {
         text.style.display = "none"; // Hide the text
+      }
+    };
+
+    svg.addEventListener("mousemove", mouseMoveHandler);
+    svg.addEventListener("click", function (event) {
+      if (hoverPoints(event)) {
+        svg.removeEventListener("mousemove", mouseMoveHandler);
+
+        const existingText = Array.from(allSVGPointTexts).find(
+          (svgText) => svgText.textContent === text.textContent,
+        );
+        if (existingText) {
+          allSVGPointTexts.delete(existingText);
+          svg.addEventListener("mousemove", mouseMoveHandler);
+          svg.removeChild(text);
+        } else {
+          allSVGPointTexts.add(text);
+        }
       }
     });
   }
