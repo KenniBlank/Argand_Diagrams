@@ -52,7 +52,8 @@
 }
 
 .ArgandDiagram > #zoomOut {
-    top: 10rem;
+    top: 9rem;
+    font-size: 1.3rem;
 }
 .ArgandDiagram > #zoomIn {
     top: 6rem;

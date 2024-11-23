@@ -1,3 +1,4 @@
+console.clear();
 const argandDiagrams = document.getElementsByClassName("ArgandDiagram");
 
 for (const diagram of argandDiagrams) {
@@ -58,9 +59,7 @@ for (const diagram of argandDiagrams) {
     inputField.addEventListener("keypress", handleKeyPress);
     inputField.addEventListener("keypress", (event) => {
       if (event.key === "Enter") {
-        drawAxesAndGrid(svg, centerX, centerY);
-
-        // drawTickMarkings(svg, centerX, centerY, scale);
+        drawAxesAndGridAndTickMarkings(svg, centerX, centerY, scale);
 
         const equationInputsTemp = diagram.querySelectorAll(
           "div#AllInputs input[type='text']",
@@ -86,7 +85,7 @@ for (const diagram of argandDiagrams) {
   });
 
   // Draw axes and grid
-  function drawAxesAndGrid(svg, centerX, centerY) {
+  function drawAxesAndGridAndTickMarkings(svg, centerX, centerY, scale) {
     // Clear SVG
     svg.innerHTML = "";
 
@@ -101,6 +100,9 @@ for (const diagram of argandDiagrams) {
 
     const yAxis = createLine(centerX, 0, centerX, height, "black", 1.5);
     svg.appendChild(yAxis);
+
+    // Draw tick markings:
+    //
   }
 
   function drawGrid(svg, centerX, centerY, scale) {
@@ -115,6 +117,39 @@ for (const diagram of argandDiagrams) {
       const line = createLine(0, y, width, y, "#a0b0c0", 0.5);
       svg.appendChild(line);
     }
+
+    // Axis Name:
+    let NegReal = document.createElementNS(
+      "http://www.w3.org/2000/svg",
+      "text",
+    );
+    NegReal.setAttribute("x", 5);
+    NegReal.setAttribute("font-size", "25");
+    NegReal.setAttribute("y", centerY + NegReal.getBBox().height);
+    NegReal.setAttribute("font-style", "italic");
+    NegReal.setAttribute("stroke", "white");
+    NegReal.setAttribute("stroke-width", "2");
+    NegReal.setAttribute("paint-order", "stroke");
+    NegReal.setAttribute("fill", "black");
+    NegReal.textContent = "-Re";
+    svg.appendChild(NegReal);
+
+    let PosReal = NegReal.cloneNode(true);
+    PosReal.textContent = "+Re";
+    PosReal.setAttribute("x", width - PosReal.textContent.length * 26);
+    svg.appendChild(PosReal);
+
+    let PosImag = PosReal.cloneNode(true);
+    PosImag.textContent = "+Im";
+    PosImag.setAttribute("x", centerX);
+    PosImag.setAttribute("y", 25);
+    svg.appendChild(PosImag);
+
+    let PosNeg = PosImag.cloneNode(true);
+    PosNeg.textContent = "-Im";
+    PosNeg.setAttribute("x", centerX);
+    PosNeg.setAttribute("y", height - 10);
+    svg.appendChild(PosNeg);
   }
 
   function createLine(x1, y1, x2, y2, color, strokeWidth) {
@@ -136,12 +171,12 @@ for (const diagram of argandDiagrams) {
 
     let real, imaginary;
     try {
-      // Ensure match is not null or undefined before accessing it
       if (match && match.length > 2) {
         real = parseFloat(match[1]);
         imaginary = parseFloat(match[2]);
       } else {
-        // Continue if match error
+        // regexPattern =
+        // Im(Z) = 2
         return;
       }
     } catch (error) {
@@ -209,7 +244,7 @@ for (const diagram of argandDiagrams) {
       const mouseY = event.clientY - rect.top; // Mouse Y relative to SVG
 
       // Check if mouse is near (centerX, centerY) within a tolerance
-      const tolerance = 5; // Tolerance distance
+      const tolerance = 3; // Tolerance distance
       if (
         Math.abs(mouseX - X) <= tolerance &&
         Math.abs(mouseY - Y) <= tolerance
@@ -252,5 +287,5 @@ for (const diagram of argandDiagrams) {
   }
 
   // Initial setup
-  drawAxesAndGrid(svg, centerX, centerY);
+  drawAxesAndGridAndTickMarkings(svg, centerX, centerY, scale);
 }
