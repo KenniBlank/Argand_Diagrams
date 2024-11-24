@@ -1,23 +1,25 @@
 .ArgandDiagram {
+    position: fixed;
     text-align: center;
+    width: 95%;
+    height: 80%;
 }
 .ArgandDiagram > svg {
-    width: 99%;
+    width: 97%;
     border: 2px solid grey;
     border-radius: 8px;
-    margin-top: 10px;
 }
 
 .ArgandDiagram > #AllInputs {
-    margin-top: 1rem;
-    margin-left: 2rem;
+    margin-left: 4rem;
+    /* margin-top: 1rem; */
     height: 55%;
     position: absolute;
     padding: 1rem;
     overflow-y: auto;
-    width: 30%;
-    min-width: 100px;
-    max-width: 250px;
+    width: 25%;
+    min-width: 50px;
+    max-width: 150px;
 }
 
 .ArgandDiagram > div#hideInputs {
@@ -26,7 +28,7 @@
     cursor: pointer;
     transform: rotate(90deg);
     font-size: 2rem;
-    margin-left: 2rem;
+    margin-left: 3rem;
     margin-top: 1rem;
 }
 
@@ -38,24 +40,21 @@
         box-shadow 0.1s;
 }
 
-.ArgandDiagram > #zoomIn,
-.ArgandDiagram > #zoomOut {
+.ArgandDiagram > #zoom-controls > * {
     position: absolute;
-    right: 0;
-    margin-right: 2rem;
+    right: 2rem;
     padding: 0.2rem;
     font-size: 1.2rem;
     border: 1px solid black;
     /* cursor: pointer; */
-    width: 50px;
+    width: 30px;
     border-radius: 8px;
 }
 
-.ArgandDiagram > #zoomOut {
+.ArgandDiagram > #zoom-controls > #zoomOut {
     top: 9rem;
-    font-size: 1.3rem;
 }
-.ArgandDiagram > #zoomIn {
+.ArgandDiagram > #zoom-controls > #zoomIn {
     top: 6rem;
 }
 

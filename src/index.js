@@ -2,7 +2,7 @@ console.clear();
 const argandDiagrams = document.getElementsByClassName("ArgandDiagram");
 
 for (const diagram of argandDiagrams) {
-  const svg = diagram.querySelector(".ArgandDiagram > svg");
+  const svg = diagram.querySelector("svg");
   const equationInputs = diagram.querySelectorAll("input[type='text']");
 
   const toggleMenu = diagram.querySelector("div#hideInputs");
@@ -18,14 +18,15 @@ for (const diagram of argandDiagrams) {
   });
 
   // Set SVG dimensions
-  svg.setAttribute("width", window.innerWidth / argandDiagrams.length);
-  svg.setAttribute("height", window.innerHeight);
+  let temp = diagram.getBoundingClientRect();
+  svg.setAttribute("width", temp.width);
+  svg.setAttribute("height", temp.height);
 
   const width = svg.getAttribute("width");
   const height = svg.getAttribute("height");
   const centerX = Math.floor(width / 2); // Center of SVG for x-axis
   const centerY = Math.floor(height / 2); // Center of SVG for y-axis
-  const scale = 30; // 1 unit = 20 pixels
+  const scale = 35; // 1 unit = 35 pixels
 
   const allInputs = diagram.querySelectorAll("#inputs input");
 
@@ -102,7 +103,7 @@ for (const diagram of argandDiagrams) {
     svg.appendChild(yAxis);
 
     // Draw tick markings:
-    let fontSize = 0.5 * scale,
+    let fontSize = 15,
       varValue = 1;
     for (let x = centerX % scale; x <= width; x += scale) {
       let PosReal = document.createElementNS(
@@ -208,7 +209,7 @@ for (const diagram of argandDiagrams) {
     PosReal.textContent = "+Re";
     PosReal.setAttribute(
       "x",
-      width - PosReal.textContent.length * (fontSize + 3),
+      width - PosReal.textContent.length * (fontSize + fontSize / 2),
     );
     svg.appendChild(PosReal);
 
@@ -239,21 +240,38 @@ for (const diagram of argandDiagrams) {
   // Plot a complex number
   function plotComplexNumber(equation, svg, centerX, centerY, scale) {
     // Parse the complex number
-    let regexPattern = /\(\s*(-?\d*\.?\d+)\s*,\s*(-?\d*\.?\d+)\s*\)/;
-    let match = equation.match(regexPattern);
-
-    let real, imaginary;
+    console.log();
+    let real = 0,
+      imaginary = 0,
+      other = "",
+      regexPattern,
+      match;
     try {
-      if (match && match.length > 2) {
+      // Match (a, b) format
+      regexPattern = /\(\s*(-?\d*\.?\d+)\s*,\s*(-?\d*\.?\d+)\s*\)/;
+      match = equation.match(regexPattern);
+
+      if (match && match.length == 3) {
         real = parseFloat(match[1]);
         imaginary = parseFloat(match[2]);
       } else {
-        // regexPattern =
-        // Im(Z) = 2
-        return;
+        throw new Error();
       }
     } catch (error) {
-      console.error("Error parsing match values:", error);
+      try {
+        // Match Im = b, Re = a format
+        regexPattern = /(im|re)\s*=\s*\(?(\d+)\)?/i;
+        match = equation.match(regexPattern);
+        other = match[1].toUpperCase();
+        if (other == "RE") {
+          real = parseFloat(match[2]);
+        } else {
+          imaginary = parseFloat(match[2]);
+        }
+      } catch (error) {
+        console.log("Not another format but Invalid Entry (empty or gibrish)");
+        return;
+      }
     }
 
     // Convert to canvas coordinates
@@ -272,15 +290,35 @@ for (const diagram of argandDiagrams) {
     point.setAttribute("fill", "blue");
     svg.appendChild(point);
 
-    // Draw the line from origin to point
-    // const line = createLine(centerX, centerY, canvasX, canvasY, "red", 1);
-    // svg.appendChild(line);
-
-    pointsOnThePlot(svg, canvasX, canvasY, real, imaginary); // Draw the point's location on the plane
+    // Draw the line for real and imaginary points
+    if (other) {
+      if (other == "RE") {
+        const line = createLine(
+          centerX + (canvasX - centerX),
+          0,
+          canvasX,
+          height,
+          "green",
+          1,
+        );
+        svg.appendChild(line);
+      } else {
+        const line = createLine(
+          0,
+          centerY - (centerY - canvasY),
+          width,
+          canvasY,
+          "red",
+          1,
+        );
+        svg.appendChild(line);
+      }
+    }
+    pointsOnThePlot(svg, canvasX, canvasY, real, imaginary, other); // Draw the point's location on the plane
   }
 
   const allSVGPointTexts = new Set();
-  function pointsOnThePlot(svg, X, Y, displayX, displayY) {
+  function pointsOnThePlot(svg, X, Y, displayX, displayY, other = "") {
     // Create an SVG <text> element
     const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
     text.setAttribute("x", X);
