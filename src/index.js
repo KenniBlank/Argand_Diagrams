@@ -1,6 +1,54 @@
 console.clear();
 const argandDiagrams = document.getElementsByClassName("ArgandDiagram");
 
+// Function to create the Argand Diagram elements
+document.querySelectorAll(".ArgandDiagram").forEach(createArgandDiagram);
+function createArgandDiagram(container) {
+  // Create the elements
+  const h2 = document.createElement("h2");
+  h2.textContent = "Placeholder";
+
+  const hideInputs = document.createElement("div");
+  hideInputs.id = "hideInputs";
+  hideInputs.textContent = "|||";
+
+  const allInputs = document.createElement("div");
+  allInputs.id = "AllInputs";
+
+  const inputContainer = document.createElement("div");
+  inputContainer.className = "input-container";
+
+  const input = document.createElement("input");
+  input.type = "text";
+  input.placeholder = "...";
+  input.required = true;
+
+  const zoomControls = document.createElement("div");
+  zoomControls.id = "zoom-controls";
+
+  const zoomIn = document.createElement("div");
+  zoomIn.id = "zoomIn";
+  zoomIn.textContent = "+";
+
+  const zoomOut = document.createElement("div");
+  zoomOut.id = "zoomOut";
+  zoomOut.textContent = "-";
+
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  svg.id = "svg";
+
+  // Append the elements to the container
+  inputContainer.appendChild(input);
+  allInputs.appendChild(inputContainer);
+  zoomControls.appendChild(zoomIn);
+  zoomControls.appendChild(zoomOut);
+  container.appendChild(h2);
+  container.appendChild(hideInputs);
+  container.appendChild(allInputs);
+  container.appendChild(zoomControls);
+  container.appendChild(svg);
+}
+
 for (const diagram of argandDiagrams) {
   const svg = diagram.querySelector("svg");
   const equationInputs = diagram.querySelectorAll("input[type='text']");
@@ -272,9 +320,15 @@ for (const diagram of argandDiagrams) {
           throw new Error();
         }
       } catch (error) {
-        // Match |Z| = x format
-        console.log("Not another format but Invalid Entry (empty or gibrish)");
-        return;
+        // Match |Z + a + ib| = x format or |Z - (a, b)| = x format
+        try {
+          regexPattern = /\s*=\s*/;
+        } catch (error) {
+          console.log(
+            "Not another format but Invalid Entry (empty or gibrish)",
+          );
+          return;
+        }
       }
     }
 
