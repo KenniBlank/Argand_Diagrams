@@ -248,7 +248,7 @@ for (const diagram of argandDiagrams) {
       match;
     try {
       // Match (a, b) format
-      regexPattern = /\(\s*(-?\d*\.?\d+)\s*,\s*(-?\d*\.?\d+)\s*\)/;
+      regexPattern = /\s*\(\s*(-?\d*\.?\d+)\s*,\s*(-?\d*\.?\d+)\s*\)\s*/;
       match = equation.match(regexPattern);
 
       if (match && match.length == 3) {
@@ -260,15 +260,19 @@ for (const diagram of argandDiagrams) {
     } catch (error) {
       try {
         // Match Im = b, Re = a format
-        regexPattern = /(im|re)\s*=\s*\(?(\d+)\)?/i;
+        regexPattern =
+          /\s*(im|re)\s*\(\s*\w+\s*\)\s*=\s*\(?(-?\d*\.?\d+)\)?\s*/i;
         match = equation.match(regexPattern);
         other = match[1].toUpperCase();
         if (other == "RE") {
           real = parseFloat(match[2]);
-        } else {
+        } else if (other == "IM") {
           imaginary = parseFloat(match[2]);
+        } else {
+          throw new Error();
         }
       } catch (error) {
+        // Match |Z| = x format
         console.log("Not another format but Invalid Entry (empty or gibrish)");
         return;
       }
@@ -278,17 +282,19 @@ for (const diagram of argandDiagrams) {
     const canvasX = centerX + real * scale;
     const canvasY = centerY - imaginary * scale;
 
-    // Draw the point
-    const point = document.createElementNS(
-      "http://www.w3.org/2000/svg",
-      "circle",
-    );
+    if (!other) {
+      // Draw the point
+      const point = document.createElementNS(
+        "http://www.w3.org/2000/svg",
+        "circle",
+      );
 
-    point.setAttribute("cx", canvasX);
-    point.setAttribute("cy", canvasY);
-    point.setAttribute("r", 3);
-    point.setAttribute("fill", "blue");
-    svg.appendChild(point);
+      point.setAttribute("cx", canvasX);
+      point.setAttribute("cy", canvasY);
+      point.setAttribute("r", 3);
+      point.setAttribute("fill", "blue");
+      svg.appendChild(point);
+    }
 
     // Draw the line for real and imaginary points
     if (other) {
@@ -355,17 +361,14 @@ for (const diagram of argandDiagrams) {
       const mouseY = event.clientY - rect.top; // Mouse Y relative to SVG
 
       // Check if mouse is near (centerX, centerY) within a tolerance
-      const tolerance = 3; // Tolerance distance
+      const tolerance = 5; // Tolerance distance
       if (
         Math.abs(mouseX - X) <= tolerance &&
         Math.abs(mouseY - Y) <= tolerance
       ) {
-        // Update text content dynamically to show the mouse coordinates
-        // text.textContent = `(${mouseX}, ${mouseY})`;
-
         // Center the text above the mouse cursor
         text.setAttribute("x", mouseX - text.getBBox().width / 2); // Center horizontally
-        text.setAttribute("y", mouseY - 10); // 10px above mouse
+        text.setAttribute("y", mouseY - 8); // 10px above mouse
         return true;
       }
       return false;
